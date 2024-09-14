@@ -4,6 +4,7 @@ FROM python:3.9
 # Définit le répertoire de travail dans le conteneur
 WORKDIR /app
 RUN apt update && apt install git -y
+RUN git config --global --add safe.directory /app
 # Copie le fichier requirements.txt dans le répertoire de travail
 COPY requirements.txt requirements.txt
 

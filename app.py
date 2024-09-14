@@ -1,31 +1,30 @@
-import git
-import docker
-import time
+from git import Repo, GitCommandError
 
-def update_and_restart(repo_path):
-    """
-    Args:
-        repo_path (str): Chemin vers le répertoire racine du dépôt Git.
-        docker_compose_file (str): Chemin vers le fichier docker-compose.yml.
-    """
+# Chemin vers le répertoire git de ton projet
+repo_path = '.git'
 
-    repo = git.Repo(repo_path)
+# Ouvrir le dépôt Git
+repo = Repo(repo_path)
 
-    while True:
-        try:
-            origin = repo.remote(name='origin')
-            origin.fetch()
-            repo.remotes.origin.pull()
-            print("Dépôt mis à jour.")
-            
-        except:
-            print("wait 60s")
-            time.sleep(60)  # Attendre 60 secondes avant la prochaine vérification
-        print("wait 60s")
+# Obtenir le commit actuel (HEAD) de la branche locale
+current_commit = repo.head.commit
 
-        time.sleep(60)  # Attendre 60 secondes avant la prochaine vérification
+# Obtenir le commit de la branche `origin/main`
+origin_main_commit = repo.commit('origin/main')
 
-# Remplacer par les chemins de votre dépôt et de votre fichier docker-compose
-repo_path = "/.git"
-print("start")
-update_and_restart(repo_path)
+# Comparer les deux commits
+if current_commit == origin_main_commit:
+    print("Le commit actuel est le même que celui de 'origin/main'.")
+else:
+    print("Le commit actuel est différent de celui de 'origin/main'.")
+    
+    try:
+        # Faire un fetch pour récupérer les dernières modifications
+        repo.remotes.origin.fetch()
+        print("Fetch terminé avec succès.")
+
+        # Faire un pull pour mettre à jour la branche locale
+        repo.remotes.origin.pull()
+        print("Pull terminé avec succès.")
+    except GitCommandError as e:
+        print(f"Une erreur est survenue lors du fetch ou du pull : {e}")
