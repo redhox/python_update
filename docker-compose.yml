@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5007:5000"
+    volumes:
+      - .git:/.git
+      - ./:/app
+    command: python app.py
